@@ -1,9 +1,39 @@
-실행 방법
-ros2 launch fire_robot_gazebo sim.launch.py # 터미널 1
-ros2 launch fire_sim fire_sim.launch.py min_delay:=3.0 max_delay:=5.0 # 터미널 2
-ros2 launch fire_detection fire_detection.launch.py # 터미널 3
-ros2 topic echo /fire_detection/bearing # 방위각 확인
-ros2 topic echo /fire_sim/hp # HP 확인
-ros2 topic pub -r 5 /spray/active std_msgs/msg/Bool "{data: true}" # 분사
+실행 방법 (Milestone 6 — 전체 시나리오)
 
-ros2 launch fire_robot_navigation navigation.launch.py # rviz
+# 권장: 한 번에 실행 (Jetson Orin Nano Super)
+# GUI/RViz 끔 + headless rendering 으로 RTF 유지
+source /opt/ros/humble/setup.bash
+source ~/proj_ws/install/setup.bash   # 워크스페이스 경로에 맞게 조정
+
+ros2 launch fire_mission full.launch.py
+# 데모용 GUI:   ros2 launch fire_mission full.launch.py gui:=true rviz:=true
+# 빠른 화재:    ros2 launch fire_mission full.launch.py min_delay:=5.0 max_delay:=10.0
+
+# 확인용 토픽
+# ros2 topic echo /fire_detection/detected
+# ros2 topic echo /fire_detection/bearing
+# ros2 topic echo /fire_sim/hp
+# ros2 topic echo /spray/active
+# gz topic -e -t /stats   # real_time_factor (목표 ≈ 1.0)
+
+# --- 단계별 (디버그용) ---
+# 터미널 1: ros2 launch fire_robot_gazebo sim.launch.py gui:=false
+# 터미널 2: ros2 launch fire_robot_navigation navigation.launch.py rviz:=false
+# 터미널 3: ros2 launch fire_sim fire_sim.launch.py min_delay:=5.0 max_delay:=10.0
+# 터미널 4: ros2 launch fire_detection fire_detection.launch.py
+# 터미널 5: ros2 launch fire_mission mission.launch.py
+
+# 오프라인 커버리지 (Gazebo 불필요)
+# python3 src/fire_mission/scripts/check_coverage.py \
+#   src/fire_robot_navigation/maps/house.yaml \
+#   src/fire_mission/config/mission.yaml \
+#   src/fire_sim/config/fire_sim.yaml
+
+# Jetson 체크리스트 (AGENTS.md §5 / §7.6)
+# [ ] full.launch 후 gz stats RTF ≥ ~0.7 (목표 1.0)
+# [ ] 순찰 중 화재 스폰 → 열화상만으로 감지 (GT 미사용)
+# [ ] 신고 메시지 1회: "화재 감지 — 119 신고" + 위치
+# [ ] 감지→분사 시작 ≤ 60 s (맵 전 후보)
+# [ ] 분사 중 소화 분말 파티클이 노즐→화재 방향
+# [ ] 분사 유효: spraying + 거리 1.0–2.0 m + 정렬 ±10° → HP 감소 → 화재 소멸
+# [ ] VERIFY 후 PATROL 복귀

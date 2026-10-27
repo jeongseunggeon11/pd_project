@@ -12,7 +12,8 @@
 <sdf version="1.9">
   <world name="house">
     <physics name="default_physics" type="ode">
-      <max_step_size>0.004</max_step_size>
+      <!-- 125 Hz: lighter on Jetson Orin than 250 Hz; still stable for diff-drive -->
+      <max_step_size>0.008</max_step_size>
       <real_time_factor>1.0</real_time_factor>
     </physics>
 

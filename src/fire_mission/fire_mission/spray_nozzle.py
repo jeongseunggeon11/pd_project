@@ -34,7 +34,7 @@ class SprayNozzle(Node):
         world = self.declare_parameter('world_name', 'house').value
         self.robot_name = self.declare_parameter('robot_name', 'fire_robot').value
         # Nozzle pose in the robot model frame (see fire_robot.urdf.xacro)
-        self.nozzle_x = self.declare_parameter('nozzle_x', 0.19).value
+        self.nozzle_x = self.declare_parameter('nozzle_x', 0.17).value
         self.nozzle_z = self.declare_parameter('nozzle_z', 0.11).value
         self.nozzle_pitch = self.declare_parameter('nozzle_pitch', -0.08).value
         with open(os.path.join(get_package_share_directory('fire_mission'),
