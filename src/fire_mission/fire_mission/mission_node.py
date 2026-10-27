@@ -25,7 +25,7 @@ from std_msgs.msg import Bool, Empty, Float32
 from tf2_ros import Buffer, TransformListener
 
 LOOP_PERIOD = 0.1          # [s]
-BEARING_FRESH = 0.3        # [s] a bearing older than this is stale
+BEARING_FRESH = 0.5        # [s] thermal ~5 Hz; allow one dropped frame under load
 SENSOR_X = 0.05            # [m] thermal camera and LiDAR are both 5 cm ahead of base_link
 RANGE_WINDOW = math.radians(2.0)  # a fire 0.3 m wide spans about +-2 deg at 4 m
 STATIC_MARGIN = 0.15       # [m] LiDAR hits this close to a mapped obstacle are not the fire

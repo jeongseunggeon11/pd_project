@@ -2,47 +2,60 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.conditions import IfCondition, UnlessCondition
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
+def _launch_gz(context, *args, **kwargs):
+    """Build gz args after substitutions resolve (gui / headless_rendering)."""
+    gazebo_dir = get_package_share_directory('fire_robot_gazebo')
+    world = os.path.join(gazebo_dir, 'worlds', 'house.sdf')
+    gui = LaunchConfiguration('gui').perform(context).lower() in ('true', '1', 'yes')
+    headless = LaunchConfiguration('headless_rendering').perform(context).lower() in (
+        'true', '1', 'yes')
+
+    gz_args = '-r'
+    if not gui:
+        gz_args += ' -s'
+    if headless or not gui:
+        # EGL path for GPU sensors without an X display (Jetson / CI). Harmless with GUI.
+        gz_args += ' --headless-rendering'
+    gz_args += f' {world}'
+
+    ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
+    return [
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(ros_gz_sim_dir, 'launch', 'gz_sim.launch.py')),
+            launch_arguments={'gz_args': gz_args}.items(),
+        ),
+    ]
+
+
 def generate_launch_description():
     gazebo_dir = get_package_share_directory('fire_robot_gazebo')
     description_dir = get_package_share_directory('fire_robot_description')
-    ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
-
-    world = os.path.join(gazebo_dir, 'worlds', 'house.sdf')
     bridge_config = os.path.join(gazebo_dir, 'config', 'bridge.yaml')
 
-    gui = LaunchConfiguration('gui')
     x = LaunchConfiguration('x')
     y = LaunchConfiguration('y')
     yaw = LaunchConfiguration('yaw')
 
-    gz_launch = os.path.join(ros_gz_sim_dir, 'launch', 'gz_sim.launch.py')
-
     return LaunchDescription([
         DeclareLaunchArgument('gui', default_value='true', description='Start Gazebo GUI'),
+        DeclareLaunchArgument(
+            'headless_rendering', default_value='false',
+            description='Force EGL headless rendering (also enabled when gui:=false)'),
         DeclareLaunchArgument('spawn', default_value='true',
                               description='Spawn the robot here (false: the parent launch spawns it)'),
         DeclareLaunchArgument('x', default_value='4.5'),
         DeclareLaunchArgument('y', default_value='2.0'),
         DeclareLaunchArgument('yaw', default_value='0.0'),
 
-        # Gazebo server (+ GUI)
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(gz_launch),
-            launch_arguments={'gz_args': f'-r {world}'}.items(),
-            condition=IfCondition(gui),
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(gz_launch),
-            launch_arguments={'gz_args': f'-r -s {world}'}.items(),
-            condition=UnlessCondition(gui),
-        ),
+        OpaqueFunction(function=_launch_gz),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(

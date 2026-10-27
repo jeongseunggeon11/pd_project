@@ -1,4 +1,7 @@
-"""Whole scenario: simulation, Nav2, fire simulation, detection and the mission state machine."""
+"""Whole scenario: simulation, Nav2, fire simulation, detection and the mission state machine.
+
+Jetson-oriented defaults: no Gazebo GUI, no RViz. Override with gui:=true / rviz:=true for demos.
+"""
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -42,13 +45,20 @@ def generate_launch_description():
     ]
 
     return LaunchDescription([
-        DeclareLaunchArgument('gui', default_value='true'),
+        DeclareLaunchArgument(
+            'gui', default_value='false',
+            description='Gazebo GUI (false recommended on Jetson for RTF)'),
+        DeclareLaunchArgument(
+            'headless_rendering', default_value='false',
+            description='Force EGL headless rendering; auto-on when gui:=false'),
         DeclareLaunchArgument('rviz', default_value='false'),
         DeclareLaunchArgument('min_delay', default_value='30.0'),
         DeclareLaunchArgument('max_delay', default_value='120.0'),
 
         include('fire_robot_gazebo', 'sim.launch.py',
-                {'gui': LaunchConfiguration('gui'), 'spawn': 'false'}),
+                {'gui': LaunchConfiguration('gui'),
+                 'headless_rendering': LaunchConfiguration('headless_rendering'),
+                 'spawn': 'false'}),
         spawn,
         RegisterEventHandler(OnProcessExit(
             target_action=spawn,
