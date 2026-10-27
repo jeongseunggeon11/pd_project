@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Simple fire: emissive orange cylinder, hot (600 K) for the thermal camera. -->
+<sdf version="1.9">
+  <model name="fire">
+    <static>true</static>
+    <link name="link">
+      <pose>0 0 0.2 0 0 0</pose>
+      <collision name="collision">
+        <geometry><cylinder><radius>0.15</radius><length>0.4</length></cylinder></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><cylinder><radius>0.15</radius><length>0.4</length></cylinder></geometry>
+        <material>
+          <ambient>1.0 0.4 0.0 1</ambient>
+          <diffuse>1.0 0.4 0.0 1</diffuse>
+          <emissive>1.0 0.35 0.0 1</emissive>
+        </material>
+        <plugin filename="gz-sim-thermal-system" name="gz::sim::systems::Thermal">
+          <temperature>600.0</temperature>
+        </plugin>
+      </visual>
+    </link>
+  </model>
+</sdf>

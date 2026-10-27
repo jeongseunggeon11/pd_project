@@ -1,0 +1,9 @@
+실행 방법
+ros2 launch fire_robot_gazebo sim.launch.py # 터미널 1
+ros2 launch fire_sim fire_sim.launch.py min_delay:=3.0 max_delay:=5.0 # 터미널 2
+ros2 launch fire_detection fire_detection.launch.py # 터미널 3
+ros2 topic echo /fire_detection/bearing # 방위각 확인
+ros2 topic echo /fire_sim/hp # HP 확인
+ros2 topic pub -r 5 /spray/active std_msgs/msg/Bool "{data: true}" # 분사
+
+ros2 launch fire_robot_navigation navigation.launch.py # rviz

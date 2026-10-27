@@ -1,0 +1,8 @@
+fire_detector:
+  ros__parameters:
+    threshold_k: 450.0     # [K] hotter pixels count as fire
+    resolution_k: 0.01     # [K] per L16 unit (Gazebo thermal camera default)
+    min_pixels: 4          # hot pixels needed for a frame to count as a hit
+    confirm_frames: 3      # consecutive hits to confirm
+    clear_frames: 3        # consecutive misses to clear
+    hfov: 1.0472           # [rad] must match the thermal camera in the URDF

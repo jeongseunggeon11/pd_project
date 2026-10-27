@@ -1,0 +1,30 @@
+fire_generator:
+  ros__parameters:
+    world_name: house
+    wait_for_patrol: true   # start the first delay on /patrol/started
+    min_delay: 30.0   # [s] random delay before each fire (after patrol start / after extinguish)
+    max_delay: 120.0
+    # Candidate fire positions [x1, y1, x2, y2, ...] in map frame (== Gazebo world).
+    # Each is >= 0.5 m away from walls and furniture.
+    candidates: [
+      0.7, 2.8,    # living room, west
+      3.8, 0.7,    # living room, south
+      4.5, 3.8,    # living room, north
+      7.0, 0.7,    # kitchen, south
+      8.9, 3.8,    # kitchen, north
+      0.8, 5.3,    # bedroom 1, door side
+      3.2, 6.6,    # bedroom 1, desk side
+      5.0, 7.3,    # hall
+      7.3, 5.3,    # bedroom 2, door side
+      7.2, 7.3,    # bedroom 2, wardrobe side
+    ]
+
+fire_manager:
+  ros__parameters:
+    world_name: house
+    robot_name: fire_robot
+    max_hp: 100.0
+    damage_rate: 10.0      # [HP/s] while spraying is effective
+    min_distance: 1.0      # [m] robot center to fire center
+    max_distance: 2.0
+    max_angle_deg: 10.0    # robot heading vs. direction to fire

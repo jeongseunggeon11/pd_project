@@ -1,0 +1,39 @@
+mission_node:
+  ros__parameters:
+    # Patrol waypoints [x1, y1, x2, y2, ...] in map frame, visited in order and repeated.
+    # Verify coverage with scripts/check_coverage.py after changing them.
+    waypoints: [
+      4.5, 2.2,    # 1 living room, east
+      0.9, 2.1,    # 2 living room, west
+      2.8, 5.6,    # 3 bedroom 1
+      5.0, 5.5,    # 4 hall
+      7.5, 5.6,    # 5 bedroom 2
+      7.0, 3.6,    # 6 kitchen, north
+      8.7, 1.0,    # 7 kitchen, south-east
+    ]
+    spin_time_allowance: 30.0   # [s] for one 360 deg scan
+
+    # Rooms for the report: names and [x_min, y_min, x_max, y_max] per room
+    room_names: ["거실", "주방", "방1", "현관", "방2"]
+    room_bounds: [
+      0.0, 0.0, 6.0, 4.5,
+      6.0, 0.0, 10.0, 4.5,
+      0.0, 4.5, 4.0, 8.0,
+      4.0, 4.5, 6.0, 8.0,
+      6.0, 4.5, 10.0, 8.0,
+    ]
+
+    # Approach / align / spray
+    spray_distance: 1.5        # [m] target robot-to-fire-center distance
+    min_distance: 1.0          # [m] allowed spray range
+    max_distance: 2.0
+    fire_radius: 0.15          # [m] LiDAR hits the fire surface; center is this much farther
+    align_tolerance_deg: 3.0   # finish ALIGN within this bearing error
+    realign_deg: 8.0           # go back to ALIGN when bearing drifts beyond this while spraying
+    align_gain: 1.5            # angular velocity = gain * bearing
+    max_align_speed: 0.4       # [rad/s]
+    align_timeout: 20.0        # [s]
+    spray_duration: 12.0       # [s] spray burst (fire HP 100 at 10 HP/s needs 10 s)
+    scan_speed: 0.6            # [rad/s] VERIFY 360 deg re-check, same as the patrol scan
+    verify_timeout: 30.0       # [s]
+    max_retries: 3             # APPROACH retries for one fire before giving up

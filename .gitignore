@@ -1,0 +1,14 @@
+# ROS build artifacts
+build/
+install/
+log/
+
+# Large unused assets
+unused/
+
+# Common junk
+.DS_Store
+*.pyc
+__pycache__/
+.env
+*.bag
